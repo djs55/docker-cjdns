@@ -20,4 +20,3 @@ RUN adduser -D -h /etc/cjdns -u 1000 cjdns \
 
 VOLUME [ "/etc/cjdns" ]
 
-ENTRYPOINT [ "/entrypoint.sh" ]
