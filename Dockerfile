@@ -1,9 +1,9 @@
 FROM alpine:3.2
-MAINTAINER Lars Gierth <larsg@systemli.org>
+MAINTAINER David Scott <dave@recoil.org>
 
-RUN apk add --update nodejs bash python git build-base linux-headers
+RUN apk add --update nodejs bash python git build-base linux-headers git
 
-ADD . /src
+RUN git clone https://github.com/cjdelisle/cjdns.git /src
 
 RUN adduser -D -h /etc/cjdns -u 1000 cjdns \
     && rm -rf /src/build_* && /src/do \
