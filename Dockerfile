@@ -1,40 +1,23 @@
-FROM debian:stable
-MAINTAINER mildred
+FROM alpine:3.2
+MAINTAINER Lars Gierth <larsg@systemli.org>
 
-# Prepare
-RUN { \
-  export DEBIAN_FRONTEND=noninteractive; \
-  apt-get update; \
-  apt-get install -y git build-essential curl python; \
-}
+RUN apk add --update nodejs bash python git build-base linux-headers
 
-# Download
-RUN { \
-  mkdir -p /usr/src; \
-  git clone https://github.com/cjdelisle/cjdns.git /usr/src/cjdns; \
-}
+ADD . /src
 
-# Build
-RUN { \
-  cd /usr/src/cjdns; \
-  : git checkout -f $(git describe --abbrev=0 --tags --always); \
-  ./do; \
-}
+RUN adduser -D -h /etc/cjdns -u 1000 cjdns \
+    && rm -rf /src/build_* && /src/do \
+    && cp /src/cjdroute /usr/bin \
+    && cp -r /src/tools/* /usr/bin \
+    && cp /src/makekeys \
+          /src/privatetopublic \
+          /src/makekeys \
+          /src/randombytes \
+          /src/sybilsim /usr/bin \
+    && cp /src/contrib/docker/entrypoint.sh / \
+    && rm -rf /src /var/cache/apk/* \
+    && apk del --purge python build-base linux-headers
 
-# Install
-RUN { \
-  install -m755 -oroot -groot /usr/src/cjdns/cjdroute /usr/bin/cjdroute; \
-  mkdir -p /etc/cjdns; \
-}
+VOLUME [ "/etc/cjdns" ]
 
-# Clean
-RUN { \
-  apt-get remove -y build-essential curl; \
-  apt-get autoremove; \
-  apt-get clean; \
-}
-
-COPY entry.sh /entry.sh
-VOLUME /etc/cjdns
-ENTRYPOINT ["/bin/bash", "/entry.sh"]
-CMD ["cjdroute", "--nobg"]
+ENTRYPOINT [ "/entrypoint.sh" ]
