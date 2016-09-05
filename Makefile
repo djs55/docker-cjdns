@@ -4,7 +4,7 @@ build: Dockerfile entrypoint.sh
 
 run: etc/cjdroute.conf
 	mkdir -p etc/cjdns
-	docker run -it --rm --cap-add=NET_ADMIN --device=/dev/net/tun --volume="$(shell pwd)/etc:/etc/cjdns" cjdns /entrypoint.sh
+	./run.sh
 
 etc/cjdroute.conf:
 	mkdir _build
